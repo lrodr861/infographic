@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Standing on Old Fire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1016;
+    --panel: #161a22;
+    --line: #262c37;
+    --text: #eceae4;
+    --muted: #8a92a3;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f2efe8; --panel: #ffffff; --line: #ddd6c8; --text: #1a1a1a; --muted: #6b6558;
+    }
+  }
+  :root[data-theme="light"] { --bg: #f2efe8; --panel: #ffffff; --line: #ddd6c8; --text: #1a1a1a; --muted: #6b6558; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100%; background: var(--bg); color: var(--text);
+    font-family: 'Manrope', system-ui, sans-serif;
+    display: flex; justify-content: center; padding: 40px 16px 64px;
+  }
+  .wrap { width: 100%; max-width: 620px; }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+
+  .eyebrow { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+  h1 { font-size: 30px; font-weight: 600; line-height: 1.15; margin: 0 0 12px; }
+  .sub { color: var(--muted); font-size: 15.5px; line-height: 1.55; max-width: 54ch; margin: 0 0 36px; }
+
+  .chain { position: relative; }
+  .layer {
+    position: relative;
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 4px;
+    opacity: 0;
+    transform: translateY(-8px);
+    animation: drop 0.5s ease forwards;
+    border: 1px solid var(--line);
+  }
+  @keyframes drop { to { opacity: 1; transform: translateY(0); } }
+
+  .layer .era { font-size: 12.5px; color: var(--layer-text-muted, var(--muted)); margin-bottom: 6px; }
+  .layer h2 { font-size: 19px; font-weight: 600; margin: 0 0 8px; color: var(--layer-text, var(--text)); }
+  .layer p { font-size: 14.5px; line-height: 1.55; margin: 0; color: var(--layer-text, var(--text)); opacity: 0.92; }
+
+  .connector { display: flex; justify-content: center; margin: 2px 0; }
+  .connector svg { display: block; }
+
+  .dig-row { display: flex; justify-content: center; margin-top: 8px; }
+  .dig-btn {
+    font-family: 'Manrope', sans-serif; font-size: 14.5px; font-weight: 600;
+    background: var(--panel); color: var(--text); border: 1px solid var(--line);
+    border-radius: 999px; padding: 11px 22px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .dig-btn:hover { border-color: var(--text); }
+  .dig-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .closing {
+    margin-top: 28px; padding: 22px 24px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel); opacity: 0; transform: translateY(-8px); animation: drop 0.5s ease forwards;
+  }
+  .closing p { font-size: 14.5px; line-height: 1.6; margin: 0 0 10px; }
+  .closing p:last-child { margin-bottom: 0; }
+  .source { font-size: 12.5px; color: var(--muted); }
+
+  .progress { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 25px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Tech enabling tech &mdash; one chain, working backward</p>
+  <h1 class="serif">Standing on old fire</h1>
+  <p class="sub">Every technology sits on top of an older one. Uber couldn&rsquo;t exist without the smartphone. The smartphone couldn&rsquo;t exist without GPS. Click back through the chain, one layer at a time, to where it actually starts.</p>
+
+  <p class="progress" id="progress">Layer 1 of 7 revealed</p>
+
+  <div class="chain" id="chain"></div>
+
+  <div class="dig-row" id="digRow">
+    <button class="dig-btn" id="digBtn" onclick="digDeeper()">Dig back one layer &darr;</button>
+  </div>
+
+  <div class="closing" id="closing" style="display:none;">
+    <p><strong class="serif">Seven layers down.</strong> None of these technologies planned for what they'd eventually enable. Fire wasn't invented to eventually give rise to ride-hailing apps. But each layer made the next one cheaper and easier to build, and that compounding is most of the story: get one general-purpose technology working, and it quietly becomes the floor everything after it stands on.</p>
+    <p class="source">Chain drawn from Mustafa Suleyman, <em>The Coming Wave</em>, ch. 2 (Uber &rarr; smartphone &rarr; GPS &rarr; satellites &rarr; rockets &rarr; combustion &rarr; language and fire), with dates added.</p>
+  </div>
+</div>
+
+<script>
+  const layers = [
+    {
+      title: 'Uber', era: '2009 &ndash; 2010',
+      text: 'Founded after its creators couldn\u2019t find a cab in Paris, Uber let a phone in your pocket summon a car and settle the fare without cash changing hands. None of that works without what comes next.',
+      bg: '#17324a', textCol: '#dcebf7', mutedCol: '#8fb3cc'
+    },
+    {
+      title: 'The smartphone', era: '2007',
+      text: 'The iPhone put a location-aware, always-connected computer in a pocket. Uber\u2019s entire premise \u2014 a driver and a rider finding each other in real time \u2014 needed that combination in one handheld device.',
+      bg: '#1c3a54', textCol: '#dfeef8', mutedCol: '#93b8cf'
+    },
+    {
+      title: 'GPS', era: '1978 &ndash; 2000',
+      text: 'The US military launched the first GPS satellites in 1978. Civilian signals stayed deliberately degraded until 2000, when that restriction was lifted and ordinary phones could suddenly pinpoint themselves to within meters.',
+      bg: '#204259', textCol: '#e2f0f7', mutedCol: '#97bdd0'
+    },
+    {
+      title: 'Satellites', era: '1957',
+      text: 'Sputnik proved an object could be put into stable orbit at all. Every GPS satellite, and everything that depends on GPS, is downstream of that first successful launch.',
+      bg: '#2b4c4f', textCol: '#e6f1ee', mutedCol: '#9fc2bd'
+    },
+    {
+      title: 'Rockets', era: '1926 &ndash; 1944',
+      text: 'Robert Goddard flew the first liquid-fueled rocket in 1926; by 1944 Germany\u2019s V-2 showed rockets could reach the edge of space. Without a vehicle that could leave the atmosphere, there is no orbit to put a satellite into.',
+      bg: '#4a4331', textCol: '#f2ece0', mutedCol: '#c9bd9e'
+    },
+    {
+      title: 'Combustion chemistry', era: '9th century onward',
+      text: 'Gunpowder, first compounded in China around the 9th century, was the earliest engineered chemical reaction violent enough to propel an object. Centuries of refining that same basic idea \u2014 controlled, directional explosions \u2014 is what rocket fuel is.',
+      bg: '#54382a', textCol: '#f3e9df', mutedCol: '#cbaf9c'
+    },
+    {
+      title: 'Language and fire', era: '&gt;400,000 years ago',
+      text: 'Controlled fire gave early humans heat, light, and cooked food long before recorded history. Language let one person\u2019s discovery become everyone\u2019s knowledge. Between them, they\u2019re the first technologies that made every later one possible \u2014 including this chain itself.',
+      bg: '#5a2e22', textCol: '#f4e8e0', mutedCol: '#d0a892'
+    }
+  ];
+
+  let revealed = 0;
+  const chain = document.getElementById('chain');
+  const digBtn = document.getElementById('digBtn');
+  const digRow = document.getElementById('digRow');
+  const progress = document.getElementById('progress');
+  const closing = document.getElementById('closing');
+
+  function arrowSvg(color) {
+    return `<svg width="18" height="22" viewBox="0 0 18 22" aria-hidden="true">
+      <line x1="9" y1="0" x2="9" y2="14" stroke="${color}" stroke-width="2"></line>
+      <path d="M3 10 L9 16 L15 10" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>`;
+  }
+
+  function renderLayer(i) {
+    const l = layers[i];
+    if (i > 0) {
+      const prevMuted = layers[i - 1].mutedCol;
+      const conn = document.createElement('div');
+      conn.className = 'connector';
+      conn.innerHTML = arrowSvg(prevMuted);
+      chain.appendChild(conn);
+    }
+    const div = document.createElement('div');
+    div.className = 'layer';
+    div.style.background = l.bg;
+    div.style.setProperty('--layer-text', l.textCol);
+    div.style.setProperty('--layer-text-muted', l.mutedCol);
+    div.innerHTML = `<div class="era">${l.era}</div><h2 class="serif">${l.title}</h2><p>${l.text}</p>`;
+    chain.appendChild(div);
+  }
+
+  function digDeeper() {
+    if (revealed >= layers.length) return;
+    renderLayer(revealed);
+    revealed++;
+    progress.textContent = `Layer ${revealed} of ${layers.length} revealed`;
+    if (revealed >= layers.length) {
+      digRow.style.display = 'none';
+      closing.style.display = 'block';
+    }
+  }
+
+  digDeeper();
+</script>
+</body>
+</html>
